@@ -93,11 +93,10 @@ let const = choice [ const_integer; const_bool; const_nil ]
 
 (*=====================Identifiers=====================*)
 
-let check_ident i =
-  match i with
+let check_ident = function
   | i when is_keyword i -> fail "keyword"
   | "_" -> fail "unexpected wildcard"
-  | _ -> return i
+  | i -> return i
 ;;
 
 let ident =
