@@ -74,7 +74,7 @@ type expression =
   (** The expression such as [E1::E2]
       This also represents lists [E1; ... En] via [E]*)
   | Exp_tuple of expression list (** Tuples such as [(E1, ..., En)] *)
-  | Exp_function of pattern list * expression (** Function such as [fun P -> E] *)
+  | Exp_function of pattern * expression (** Function such as [fun P -> E] *)
   | Exp_apply of expression * expression list
   (** [Exp_apply(E0, [E1; ...; En])] represents [E0 E1 ... En] *)
   | Exp_object of obj (** [object ... end] *)

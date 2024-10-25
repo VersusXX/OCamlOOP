@@ -171,14 +171,14 @@ let exp_fun pexpr =
   | h :: tl ->
     return
       (List.fold_left
-         ~init:(Exp_function ([ h ], e))
-         ~f:(fun acc x -> Exp_function ([ x ], acc))
+         ~init:(Exp_function (h, e))
+         ~f:(fun acc x -> Exp_function (x, acc))
          tl)
   | _ -> fail "Invalid function"
 ;;
 
 (* let val_binding pat exp = { pat; exp } *)
-let efun i e = Exp_function ([ i ], e)
+let efun i e = Exp_function (i, e)
 let exp_pattern_matching pexpr = lift2 (fun k v -> k, v) (pattern <* token "->") pexpr
 
 let exp_match pexpr =
@@ -242,8 +242,8 @@ let exp_object pexpr =
     match List.rev args with
     | h :: tl ->
       List.fold_left
-        ~init:(Exp_function ([ h ], e))
-        ~f:(fun acc x -> Exp_function ([ x ], acc))
+        ~init:(Exp_function (h, e))
+        ~f:(fun acc x -> Exp_function (x, acc))
         tl
     | _ -> e
   in

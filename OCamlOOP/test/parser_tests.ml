@@ -90,7 +90,7 @@ let%expect_test "test_match" =
 (* let tests *)
 
 let%expect_test "test_with_let_function" =
-  let () = parse_test {|let f a = fun x -> x + a|} in
+  let () = parse_test {|let f a b = fun x -> x + a * b|} in
   [%expect
     {| 
     [(Str_value

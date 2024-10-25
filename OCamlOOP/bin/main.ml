@@ -11,7 +11,7 @@ let () =
         ; d_pat = Pat_var "factorial"
         ; d_exp =
             Exp_function
-              ( [ Pat_var "n" ]
+              ( Pat_var "n"
               , Exp_ifthenelse
                   ( Exp_apply (Exp_ident "<=", [ Exp_ident "n"; Exp_constant (Int 1) ])
                   , Exp_constant (Int 1)
