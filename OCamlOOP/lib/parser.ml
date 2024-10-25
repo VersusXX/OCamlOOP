@@ -88,17 +88,8 @@ let const_bool =
   | _ -> fail "Invalid boolean"
 ;;
 
-let const_float =
-  token1 @@ take_while1 is_digit
-  >>= fun s ->
-  let num = Stdlib.float_of_string_opt s in
-  match num with
-  | Some n -> return @@ Float n
-  | None -> fail "Invalid float"
-;;
-
 let const_nil = token "[]" *> return Nil
-let const = choice [ const_integer; const_float; const_bool; const_nil ]
+let const = choice [ const_integer; const_bool; const_nil ]
 
 (*=====================Identifiers=====================*)
 
