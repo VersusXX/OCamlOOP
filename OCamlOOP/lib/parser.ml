@@ -112,16 +112,16 @@ let ident =
 let pat_const = const >>| fun p -> Pat_constant p
 let pat_cons = token "::" *> return (fun a b -> Pat_cons (a, b))
 let pat_any = token "_" *> ignore_spaces *> return Pat_any
-let pat_val = ident >>| fun c -> Pat_var c
-let tuple ident f = lift2 (fun h tl -> f @@ (h :: tl)) ident (many1 (token "," *> ident))
-let pat_tuple pat = parse_in_parens (tuple pat (fun ps -> Pat_tuple ps))
+let pat_var = ident >>| fun c -> Pat_var c
+let tuple ident f = lift2 (fun h tl -> f @@ h :: tl) ident (many1 (token "," *> ident))
+let pat_tuple pat = parse_in_parens @@ tuple pat (fun ps -> Pat_tuple ps)
 
 let pattern =
   fix (fun pattern ->
     let term =
-      choice [ parse_in_parens pattern; pat_const; pat_any; pat_val; pat_tuple pattern ]
+      choice [ parse_in_parens pattern; pat_const; pat_any; pat_var; pat_tuple pattern ]
     in
-    let cons = parse_in_parens (parse_right_assoc term pat_cons) in
+    let cons = parse_in_parens @@ parse_right_assoc term pat_cons in
     cons <|> term)
 ;;
 
@@ -132,9 +132,8 @@ let exp_val = ident >>| fun c -> Exp_ident c
 let exp_cons = token "::" *> return (fun a b -> Exp_list (a, b))
 
 let exp_list expr =
-  let rec creaet_list = function
-    | [] -> Exp_constant Nil
-    | h :: tl -> Exp_list (h, creaet_list tl)
+  let creaet_list = 
+    List.fold_left ~init:(Exp_constant Nil) ~f:(fun acc h -> Exp_list (h, acc))
   in
   let basic_list = parse_in_brackets @@ sep_by (token ";") expr >>| creaet_list in
   let cons_list = parse_right_assoc (expr <|> basic_list) exp_cons in
@@ -178,7 +177,7 @@ let exp_match pexpr =
        (pexpr <* token "with")
        (exp_pattern_matching pexpr
         <|> token "|" *> exp_pattern_matching pexpr
-        >>= fun p -> many (token "|" *> exp_pattern_matching pexpr) >>| fun ps -> p :: ps
+        >>= fun p -> many1 (token "|" *> exp_pattern_matching pexpr) >>| fun ps -> p :: ps
        )
 ;;
 
@@ -195,7 +194,7 @@ let exp_decl pexpr =
   token "let"
   *> lift3
        (fun d_rec d_pat d_exp -> { d_rec; d_pat; d_exp })
-       (token "rec" *> return Rec <|> return Nonrec)
+       (token "rec " *> return Rec <|> return Nonrec)
        (token1 pattern)
        exp
 ;;
@@ -315,17 +314,14 @@ let str_item =
 
 let program = del *> many1 (str_item <* del)
 
-(* Define a standard error message for parsing issues *)
 let syntax_error_msg = "Syntax error"
 
-(* Parser function that returns an error message wrapped in a Result *)
 let parse s =
   match parse_string ~consume:All program s with
   | Ok v -> Ok v
   | Error _ -> Error syntax_error_msg
 ;;
 
-(* Parser function that handles prefixes, also returning a standard error message *)
 let parse_prefix s =
   match parse_string ~consume:Prefix program s with
   | Ok v -> Ok v

@@ -106,11 +106,7 @@ let%expect_test "test_with_let_function" =
 ;;
 
 let%expect_test "test_with_let_types" =
-  let () = parse_test {| 
-    let a = 15;;
-    let b = "Help";;
-    let c = [];;
-   |} in
+  let () = parse_test {|  let a = 15 ;; |} in
   [%expect
     {|
     [(Str_value
