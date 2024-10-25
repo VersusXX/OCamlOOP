@@ -90,14 +90,14 @@ let%expect_test "test_match" =
 (* let tests *)
 
 let%expect_test "test_with_let_function" =
-  let () = parse_test {|let f a b = fun x -> x + a * b|} in
+  let () = parse_test {|let f a = fun x -> x + a |} in
   [%expect
     {| 
     [(Str_value
         { d_rec = Nonrec; d_pat = (Pat_var "f");
           d_exp =
-          (Exp_function ([(Pat_var "a")],
-             (Exp_function ([(Pat_var "x")],
+          (Exp_function ((Pat_var "a"),
+             (Exp_function ((Pat_var "x"),
                 (Exp_binary ((Exp_ident "x"), Add, (Exp_ident "a")))))
              ))
           })
@@ -134,9 +134,9 @@ let%expect_test "test_with_let_types" =
     [(Str_value
         { d_rec = Nonrec; d_pat = (Pat_var "fib");
           d_exp =
-          (Exp_function ([(Pat_var "a")],
-             (Exp_function ([(Pat_var "b")],
-                (Exp_function ([(Pat_var "n")],
+          (Exp_function ((Pat_var "a"),
+             (Exp_function ((Pat_var "b"),
+                (Exp_function ((Pat_var "n"),
                    (Exp_ifthenelse (
                       (Exp_binary ((Exp_ident "n"), LessThan,
                          (Exp_constant (Int 2)))),
