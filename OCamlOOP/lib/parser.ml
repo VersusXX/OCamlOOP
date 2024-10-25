@@ -83,8 +83,8 @@ let const_integer =
 let const_bool =
   token1 @@ take_while1 is_letter
   >>= function
-  | "true" -> return @@ Bool true
-  | "false" -> return @@ Bool false
+  | "true" -> return @@ String "true"
+  | "false" -> return @@ String "false"
   | _ -> fail "Invalid boolean"
 ;;
 
